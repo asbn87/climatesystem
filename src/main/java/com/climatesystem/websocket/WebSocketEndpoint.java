@@ -1,5 +1,6 @@
 package com.climatesystem.websocket;
 
+import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
@@ -25,7 +26,7 @@ public class WebSocketEndpoint {
 	public static List<WebSocketEndpoint> dashboardEndpoints = new CopyOnWriteArrayList<>();
 	
 	private Session session;
-	private String mac;
+	private String id;
 	
 	public Session getSession() {
 		return session;
@@ -35,44 +36,45 @@ public class WebSocketEndpoint {
 		this.session = session;
 	}
 	
-	public String getMac() {
-		return mac;
+	public String getId() {
+		return id;
 	}
 
-	public void setMac(String mac) {
-		this.mac = mac;
+	public void setId(String id) {
+		this.id = id;
 	}
 
 	@OnOpen
 	public void onOpen(Session session, @PathParam("id") String id) {
-	    setSession(session);
 	    
+		setSession(session);
+	    setId(id);
+		
 	    switch(id) {
 	    
 	    	case "dashboard":
+	    		this.session.setMaxIdleTimeout(-1); // Dashboard sessions should have no timeout.
+	    		System.out.println("New dashboard session: " + this.session.getId());
 	    		dashboardEndpoints.add(this);
 	    		break;
 	    		
 	    	default:
+	    		this.session.setMaxIdleTimeout(60000); // If a message hasn't been received in 1min timeout session.
+	    		System.out.println("Device connected: " + this.id);
 	    		deviceEndpoints.add(this);
 	    		break;
 	    }
-	    	
 	}
 	
 	@OnClose
-	public void onClose(Session session) {
+	public void onClose(Session session) throws IOException {
 		
 		if(deviceEndpoints.contains(this)) {
-			System.out.println(
-					deviceEndpoints.get(deviceEndpoints.indexOf(this)).getMac()
-					+ " disconnected from websocket.");	
+			System.out.println("Mac: " + this.getId() + ", disconnected from websocket.");	
 			deviceEndpoints.remove(this);
 		}
 		else if(dashboardEndpoints.contains(this)) {
-			System.out.println(
-					dashboardEndpoints.get(dashboardEndpoints.indexOf(this)).getMac()
-					+ " disconnected from websocket.");	
+			System.out.println("Session id: " + session.getId() + ", closed session.");
 			dashboardEndpoints.remove(this);
 		}
 	}
