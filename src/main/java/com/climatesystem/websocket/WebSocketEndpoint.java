@@ -18,11 +18,14 @@ import org.springframework.stereotype.Component;
 import com.climatesystem.model.SensorMessage;
 
 @Component
-@ServerEndpoint(value = "/ws/{cmd}", decoders = WebSocketDecoder.class, encoders = WebSocketEncoder.class)
+@ServerEndpoint(value = "/ws/{id}", decoders = WebSocketDecoder.class, encoders = WebSocketEncoder.class)
 public class WebSocketEndpoint {
 
+	public static List<WebSocketEndpoint> deviceEndpoints = new CopyOnWriteArrayList<>(); 
+	public static List<WebSocketEndpoint> dashboardEndpoints = new CopyOnWriteArrayList<>();
+	
 	private Session session;
-	public static List<WebSocketEndpoint> listeners = new CopyOnWriteArrayList<>();
+	private String mac;
 	
 	public Session getSession() {
 		return session;
@@ -32,16 +35,46 @@ public class WebSocketEndpoint {
 		this.session = session;
 	}
 	
+	public String getMac() {
+		return mac;
+	}
+
+	public void setMac(String mac) {
+		this.mac = mac;
+	}
+
 	@OnOpen
-	public void onOpen(Session session, @PathParam("cmd") String cmd) {
+	public void onOpen(Session session, @PathParam("id") String id) {
 	    setSession(session);
-	    listeners.add(this);
+	    
+	    switch(id) {
+	    
+	    	case "dashboard":
+	    		dashboardEndpoints.add(this);
+	    		break;
+	    		
+	    	default:
+	    		deviceEndpoints.add(this);
+	    		break;
+	    }
+	    	
 	}
 	
 	@OnClose
 	public void onClose(Session session) {
-	    listeners.remove(this);
-	    setSession(null);
+		
+		if(deviceEndpoints.contains(this)) {
+			System.out.println(
+					deviceEndpoints.get(deviceEndpoints.indexOf(this)).getMac()
+					+ " disconnected from websocket.");	
+			deviceEndpoints.remove(this);
+		}
+		else if(dashboardEndpoints.contains(this)) {
+			System.out.println(
+					dashboardEndpoints.get(dashboardEndpoints.indexOf(this)).getMac()
+					+ " disconnected from websocket.");	
+			dashboardEndpoints.remove(this);
+		}
 	}
 	
 	@OnError

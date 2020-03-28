@@ -1,2 +1,2 @@
 # Climate System
-![Screenshot](doc/dashboard.PNG "Dashboard")
+![Screenshot](doc/img/dashboard.PNG "Dashboard")

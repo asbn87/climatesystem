@@ -12,10 +12,11 @@
 			
 			<div class="row d-flex justify-content-right m-1">
 				<div class="m-1">
-					<button onclick="connect()">Connect</button>
+					<button type="button" onclick="connect()">Connect</button>
 				</div>
+			
 				<div class="m-1">
-					<button onclick="disconnect()">Disconnect</button>
+					<button type="button" onclick="disconnect()">Disconnect</button>
 				</div>
 				<div class="m-2">
 					Status: <span id="status-text">Disconnected</span>
@@ -25,7 +26,7 @@
 			<div class="row d-flex justify-content-center">
 			
 				<div class="col-md-4 text-center mt-1">
-					<div class="card">
+					<div class="card shadow">
 						<div class="card-header" id="temp-header">
 							<svg width="100" height="100">
 								<image width="100" height="100" xlink:href="${contextRoot}/img/svg/temp.svg"/>
@@ -44,7 +45,7 @@
 				</div>
 	
 				<div class="col-md-4 text-center mt-1">
-					<div class="card">
+					<div class="card shadow">
 						<div class="card-header" id="hum-header">
 							<svg width="100" height="100">
 								<image width="100" height="100" xlink:href="${contextRoot}/img/svg/hum.svg"/>
@@ -64,7 +65,7 @@
 	
 	
 				<div class="col-md-4 text-center mt-1">
-					<div class="card" id="co2-card">
+					<div class="card shadow">
 						<div class="card-header" id="co2-header">
 							<svg width="100" height="100">
 								<image width="100" height="100" xlink:href="${contextRoot}/img/svg/signal.svg"/>
