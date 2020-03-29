@@ -89,9 +89,9 @@ public class WebSocketEndpoint {
 		
 		message.setDate(new SimpleDateFormat("HH:mm:ss:SSS").format(new Date()));
 		
-		// Forward incoming message to all connected peers
-		for(Session sess : session.getOpenSessions()) {
-			sess.getAsyncRemote().sendObject(message);
+		// Forward incoming message to all sessions connected to Dashboard
+		for(WebSocketEndpoint dashboardEndpoint : dashboardEndpoints) {
+			dashboardEndpoint.getSession().getAsyncRemote().sendObject(message);
 		}
 	}
 }
